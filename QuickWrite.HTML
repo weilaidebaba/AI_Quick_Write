@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI速写助手</title>
+    <style>
+        /* 极简样式，贴合产品定位 */
+        body { margin: 0; padding: 20px; font-family: sans-serif; max-width: 800px; margin: 0 auto; }
+        .container { display: flex; flex-direction: column; gap: 15px; }
+        input, textarea, button { padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
+        textarea { height: 120px; resize: none; }
+        button { background: #4285f4; color: white; border: none; cursor: pointer; }
+        button:hover { opacity: 0.9; }
+        .tab { display: flex; gap: 10px; margin-bottom: 10px; }
+        .tab-btn { flex: 1; padding: 8px; border: 1px solid #ddd; background: #f5f5f5; border-radius: 4px; cursor: pointer; }
+        .tab-btn.active { background: #4285f4; color: white; border-color: #4285f4; }
+        .copy-btn { margin-top: 10px; background: #34a853; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI速写助手</h1&gt;
+        <!-- 功能切换标签 -->
+        <div class="tab">
+            <div class="tab-btn active" data-tab="generate">短文本生成</div>
+            <div class="tab-btn" data-tab="polish">文本润色</div>
+            <div class="tab-btn" data-tab="expand">关键词拓展</div>
+        </div><!-- 短文本生成 -->
+        <div class="tab-content" id="generate" style="display:block;">
+            <input type="text" id="generateInput" placeholder="输入需求（如：写一段工作周报提纲）">
+            <button onclick="generateText()">生成文本</button>
+        &lt;/div&gt;
+
+        <!-- 文本润色 -->
+        <div class="tab-content" id="polish" style="display:none;">
+            <textarea id="polishInput" placeholder="粘贴需要润色的文本（≤300字）"></textarea>
+            <select id="polishMode">
+                <option value="simple">简洁化</option>
+                <option value="smooth">流畅化</option>
+                <option value="oral">口语化</option>
+            </select>
+            <button onclick="polishText()">润色文本</button>
+        &lt;/div&gt;
+
+        <!-- 关键词拓展 -->
+        <div class="tab-content" id="expand" style="display:none;">
+            <input type="text" id="expandInput" placeholder="输入1-3个核心关键词（用逗号分隔）">
+            <button onclick="expandKeyword()"&gt;拓展文本&lt;/button&gt;
+        &lt;/div&gt;
+
+        <!-- 输出区域 -->
+        <textarea id="output" placeholder="生成的内容将显示在这里..." readonly></textarea>
+        <button class="copy-btn" onclick="copyOutput()">一键复制</button>
+    </div>
+
+    <script>
+        // 标签切换逻辑
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.style.display = 'none');
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).style.display = 'block';
+            });
+        });
+
+        // 模拟AI接口调用（可替换为真实接口，如百度AI、阿里云AI等轻量化接口）
+        async function callAiApi(prompt) {
+            // 模拟接口延迟
+            await new Promise(resolve => setTimeout(resolve, 800));
+            // 简单模拟返回结果，实际替换为真实接口响应
+            return prompt.includes('润色') ? prompt.replace(/。/g, '，').replace('需要润色', '优化后') : 
+                   prompt.includes('关键词') ? `这款AI工具${prompt.split(',').join('、')}，能快速满足短文本创作需求，操作简单便捷。` :
+                   `根据您的需求生成：${prompt}（实际场景中此处为AI模型真实生成内容）`;
+        }
+
+        // 短文本生成
+        async function generateText() {
+            const input = document.getElementById('generateInput').value.trim();
+            if (!input) { alert('请输入需求！'); return; }
+            const prompt = `根据需求生成短文本，简洁实用，不超过100字：${input}`;
+            const result = await callAiApi(prompt);
+            document.getElementById('output').value = result;
+        }
+
+        // 文本润色
+        async function polishText() {
+            const input = document.getElementById('polishInput').value.trim();
+            const mode = document.getElementById('polishMode').value;
+            if (!input) { alert('请粘贴需要润色的文本！'); return; }
+            const prompt = `将以下文本${mode === 'simple' ? '简洁化' : mode === 'smooth' ? '流畅化' : '口语化'}，修正语病，保留核心意思：${input}`;
+            const result = await callAiApi(prompt);
+            document.getElementById('output').value = result;
+        }
+
+        // 关键词拓展
+        async function expandKeyword() {
+            const input = document.getElementById('expandInput').value.trim();
+            if (!input) { alert('请输入关键词！'); return; }
+            const prompt = `将关键词${input}拓展成连贯的短句或段落，不超过80字，贴合日常场景：`;
+            const result = await callAiApi(prompt);
+            document.getElementById('output').value = result;
+        }
+
+        // 一键复制
+        function copyOutput() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            alert('复制成功！');
+        }
+    </script>
+</body>
+</html>
